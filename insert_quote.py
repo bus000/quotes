@@ -92,4 +92,5 @@ if __name__ == '__main__':
                 break
 
     insert(root, new_author, new_quote)
-    tree.write(os.path.dirname(os.path.realpath(__file__)) + '/quotes.xml')
+    tree.write(os.path.dirname(os.path.realpath(__file__)) + '/quotes.xml',
+            encoding='utf-8')
