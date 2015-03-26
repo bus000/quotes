@@ -24,7 +24,7 @@ root = tree.getroot()
 # Find all quotes and choose a random.
 quotes = root.findall('./quote')
 i = random.randint(0, len(quotes)-1)
-quote = strip_space(quotes[i].find('content').text)
-author = '\n   - ' + (quotes[i].find('author').text.lstrip())
+quote = strip_space(quotes[i].find('content').text.encode('utf-8'))
+author = '\n   - ' + (quotes[i].find('author').text.encode('utf-8').lstrip())
 
 print quote + author
