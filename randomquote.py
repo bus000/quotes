@@ -1,30 +1,14 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python
 
-import xml.etree.ElementTree as ET
+import json
 import random
+import textwrap
 import os
 
-def strip_space(string):
-    new_string = ""
-    last_char = ""
+with open(os.path.dirname(os.path.realpath(__file__)) + '/quotes.json') as json_file:
+    quotes = json.load(json_file)
+    quote_list = quotes['quotes']
 
-    for c in string:
-        if last_char.isspace() and c.isspace():
-            last_char = c
-        else:
-            new_string += c
-            last_char = c
-
-    return new_string
-
-# Read xml file.
-tree = ET.parse(os.path.dirname(os.path.realpath(__file__)) + '/quotes.xml')
-root = tree.getroot()
-
-# Find all quotes and choose a random.
-quotes = root.findall('./quote')
-i = random.randint(0, len(quotes)-1)
-quote = strip_space(quotes[i].find('content').text.encode('utf-8'))
-author = '\n   - ' + (quotes[i].find('author').text.encode('utf-8').lstrip())
-
-print quote + author
+    chosen_quote = random.choice(quote_list)
+    print("\n".join(textwrap.wrap(chosen_quote['content'], 72)))
+    print('   -', chosen_quote['author'])
