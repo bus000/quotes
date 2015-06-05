@@ -5,7 +5,8 @@ import random
 import textwrap
 import os
 
-with open(os.path.dirname(os.path.realpath(__file__)) + '/quotes.json') as json_file:
+current_dir = os.path.dirname(os.path.realpath(__file__))
+with open(current_dir + '/quotes.json') as json_file:
     quotes = json.load(json_file)
     quote_list = quotes['quotes']
 
