@@ -1,6 +1,6 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python
 
-import xml.etree.ElementTree as ET
+import json
 import os
 import sys
 
@@ -28,69 +28,36 @@ def levenshtein_distance(s1, s2):
 
     return previous_row[-1]
 
-def strip_space(string):
-    new_string = ""
-    last_char = ""
-
-    for c in string:
-        if last_char.isspace() and c.isspace():
-            last_char = c
-        else:
-            new_string += c
-            last_char = c
-
-    return new_string
-
-def get_quotes(root):
-    # Get list of all quotes as strings.
-    quote_list = root.findall('./quote/content')
-    quote_strings = map((lambda quote: quote.text), quote_list)
-    return map(strip_space, quote_strings)
-
 def yes(decision):
     return decision == '' or decision.lower() == 'yes' or\
         decision.lower() == 'y'
 
-def insert(root, author, quote):
-    quote_tree = ET.Element('quote')
-
-    author_tree = ET.Element('author')
-    author_tree.text = author
-
-    content_tree = ET.Element('content')
-    content_tree.text = quote
-
-    quote_tree.append(author_tree)
-    quote_tree.append(content_tree)
-
-    root.append(quote_tree)
-
 if __name__ == '__main__':
-    # Read xml file.
-    tree = ET.parse(os.path.dirname(os.path.realpath(__file__)) + '/quotes.xml')
-    root = tree.getroot()
+    quote_list = None
+    quotes_json = None
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    with open(current_dir + '/quotes.json') as f:
+        quotes_json = json.load(f)
+        quote_list = quotes_json['quotes']
 
     if len(sys.argv) != 3:
-        print 'Script expects 2 arguments, an author and a quote.'
+        print('Script expects 2 arguments, an author and a quote.')
         sys.exit()
 
     new_author = str(sys.argv[1])
     new_quote = str(sys.argv[2])
 
-    all_quotes = get_quotes(root)
-
-    for quote in all_quotes:
+    for quote in quote_list:
+        quote = quote['content']
         if levenshtein_distance(new_quote, quote) < minimum_distance:
-            print 'The new quote\n\n"', new_quote, '"\n'
-            print 'is very similar to the quote\n\n\"', quote, '"\n'
+            print('The new quote\n\n"', new_quote, '"\n')
+            print('is very similar to the quote\n\n\"', quote, '"\n')
 
-            user_in = raw_input('Do you still want to insert it? [Y/n] ')
+            user_in = input('Do you still want to insert it? [Y/n] ')
 
             if not yes(user_in):
                 sys.exit()
-            else:
-                break
 
-    insert(root, new_author, new_quote)
-    tree.write(os.path.dirname(os.path.realpath(__file__)) + '/quotes.xml',
-            encoding='utf-8')
+    quote_list.append({'author': new_author, 'content': new_quote})
+    with open(current_dir + '/quotes.json', 'w') as f:
+        f.write(json.dumps(quotes_json))
