@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import getopt
 
 minimum_distance = 10
 
@@ -32,20 +33,44 @@ def yes(decision):
     return decision == '' or decision.lower() == 'yes' or\
         decision.lower() == 'y'
 
+def usage():
+    print("usage:", sys.argv[0], "-a author -q quote")
+    print("  -a: author of the quote")
+    print("  -q: the quote to insert")
+
 if __name__ == '__main__':
+    try:
+        long_args = ["help", "author", "quote"]
+        opts, args = getopt.getopt(sys.argv[1:], "ha:q:", long_args)
+    except getopt.GetoptError as err:
+        print(err)
+        usage()
+        sys.exit(2)
+
+    new_author = None
+    new_quote = None
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif o in ("-a", "--author"):
+            new_author = a
+        elif o in ("-q", "--quote"):
+            new_quote = a
+        else:
+            usage()
+            sys.exit()
+
+    if new_author is None or new_quote is None:
+        usage()
+        sys.exit()
+
     quote_list = None
     quotes_json = None
     current_dir = os.path.dirname(os.path.realpath(__file__))
     with open(current_dir + '/quotes.json') as f:
         quotes_json = json.load(f)
         quote_list = quotes_json['quotes']
-
-    if len(sys.argv) != 3:
-        print('Script expects 2 arguments, an author and a quote.')
-        sys.exit()
-
-    new_author = str(sys.argv[1])
-    new_quote = str(sys.argv[2])
 
     for quote in quote_list:
         quote = quote['content']
