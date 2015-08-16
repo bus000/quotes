@@ -43,9 +43,8 @@ if __name__ == '__main__':
         long_args = ["help", "author", "quote"]
         opts, args = getopt.getopt(sys.argv[1:], "ha:q:", long_args)
     except getopt.GetoptError as err:
-        print(err)
         usage()
-        sys.exit(2)
+        sys.exit()
 
     new_author = None
     new_quote = None
